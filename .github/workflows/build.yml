@@ -24,6 +24,7 @@ jobs:
   build:
     if: ${{ github.event_name == 'workflow_dispatch' || github.actor != 'github-actions[bot]' }}
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,8 +37,13 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Set BASE_URL
-        run: echo "BASE_URL=https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/" >> $GITHUB_ENV
+      - name: Setup Node (for Vercel CLI)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Set BASE_URL (Vercel)
+        run: echo "BASE_URL=https://daily-hub-livid.vercel.app/" >> $GITHUB_ENV
 
       - name: Append URLs from manual run into data/daily.csv
         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.urls != '' }}
@@ -110,3 +116,11 @@ jobs:
           git add docs/ data/ scripts/ .github/workflows/build.yml || true
           git commit -m "Auto-build docs"
           git push
+
+      - name: Deploy to Vercel (static docs)
+        if: ${{ secrets.VERCEL_TOKEN != '' }}
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          npm i -g vercel@latest
+          vercel ./docs --prod --yes --token "$VERCEL_TOKEN" --name "daily-hub-livid"
