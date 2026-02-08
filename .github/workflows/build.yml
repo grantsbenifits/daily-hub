@@ -130,7 +130,5 @@ jobs:
           npm i -g vercel@latest
           cd docs
           mkdir -p .vercel
-          cat > .vercel/project.json <<EOF
-          {"orgId":"${VERCEL_ORG_ID}","projectId":"${VERCEL_PROJECT_ID}"}
-          EOF
+          printf '{"orgId":"%s","projectId":"%s"}' "$VERCEL_ORG_ID" "$VERCEL_PROJECT_ID" > .vercel/project.json
           vercel deploy --prod --yes --token "$VERCEL_TOKEN"
