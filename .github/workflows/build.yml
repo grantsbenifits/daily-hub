@@ -14,7 +14,9 @@ on:
         default: ""
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
   group: discovery-hub-build
@@ -31,7 +33,7 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
-          persist-credentials: true
+          persist-credentials: false
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -45,6 +47,13 @@ jobs:
 
       - name: Set BASE_URL (Vercel canonical)
         run: echo "BASE_URL=https://daily-hub-livid.vercel.app" >> $GITHUB_ENV
+
+      - name: Restore previous state from Netlify (optional)
+        run: |
+          mkdir -p data
+          curl -fsSL https://dailyhubs.netlify.app/state/daily.csv -o data/daily.csv || true
+          curl -fsSL https://dailyhubs.netlify.app/state/history.csv -o data/history.csv || true
+          curl -fsSL https://dailyhubs.netlify.app/state/enriched.json -o data/enriched.json || true
 
       - name: Append URLs from manual run into data/daily.csv
         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.urls != '' }}
@@ -104,26 +113,19 @@ jobs:
         env:
           ENABLE_INDEXNOW: "1"
           ENABLE_PINGOMATIC: "1"
+          ENABLE_AI: "1"
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: "gemini-2.5-flash"
+          ENRICH_TTL_DAYS: "14"
+          MAX_AI_CALLS: "30"
         run: python scripts/build.py
 
-      - name: Commit generated files
+      - name: Publish state files into docs (for persistence)
         run: |
-          BRANCH="main"
-
-          git fetch origin "$BRANCH"
-          git checkout -B "$BRANCH" "origin/$BRANCH"
-
-          if [ -z "$(git status --porcelain)" ]; then
-            echo "No changes to commit."
-            exit 0
-          fi
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git add docs/ data/ scripts/ .github/workflows/build.yml || true
-          git commit -m "Auto-build docs"
-          git push origin "HEAD:$BRANCH"
+          mkdir -p docs/state
+          cp -f data/daily.csv docs/state/daily.csv || true
+          cp -f data/history.csv docs/state/history.csv || true
+          cp -f data/enriched.json docs/state/enriched.json || true
 
       - name: Deploy to Netlify (static docs)
         if: ${{ secrets.NETLIFY_AUTH_TOKEN != '' && secrets.NETLIFY_SITE_ID != '' }}
@@ -158,3 +160,15 @@ jobs:
           mkdir -p .vercel
           printf '{"orgId":"%s","projectId":"%s"}' "$VERCEL_ORG_ID" "$VERCEL_PROJECT_ID" > .vercel/project.json
           vercel deploy --prod --yes --token "$VERCEL_TOKEN"
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./docs
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
