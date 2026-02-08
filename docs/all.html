@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Discovery Hub</title>
+  <meta name="robots" content="index,follow" />
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #111a2b;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --line: rgba(255,255,255,0.12);
+      --link: #93c5fd;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      background: radial-gradient(1200px 700px at 30% -10%, rgba(59,130,246,0.22), transparent 50%),
+                  radial-gradient(1000px 600px at 110% 20%, rgba(34,197,94,0.18), transparent 45%),
+                  var(--bg);
+      color: var(--text);
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 28px 18px 48px; }
+    .card {
+      background: rgba(17,26,43,0.72);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 18px 18px;
+      backdrop-filter: blur(10px);
+    }
+    h1 { margin: 0 0 8px; font-size: 22px; letter-spacing: 0.2px; }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      align-items: center;
+      margin: 8px 0 14px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .meta a { color: var(--link); text-decoration: none; }
+    .meta a:hover { text-decoration: underline; }
+    .table-wrap {
+      overflow: auto;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+      background: rgba(0,0,0,0.16);
+    }
+    thead th {
+      text-align: left;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+      padding: 10px 10px;
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      background: rgba(17,26,43,0.92);
+      backdrop-filter: blur(10px);
+    }
+    tbody td {
+      padding: 10px 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      vertical-align: top;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+    tbody tr:hover td { background: rgba(255,255,255,0.04); }
+    td.num { width: 62px; color: var(--muted); }
+    td.url a { color: var(--link); word-break: break-all; }
+    td.host { width: 220px; color: #d1d5db; }
+    td.path { color: #d1d5db; word-break: break-word; }
+    .footer {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(0,0,0,0.18);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Discovery Hub</h1>
+      <div class="meta">
+        <span class="badge">URLs: <strong style="color:var(--text)">2</strong></span>
+        <span class="badge">Built: <strong style="color:var(--text)">2026-02-08 12:51:51 UTC</strong></span>
+        <span class="badge"><a href="https://USERNAME.github.io/discovery-hub/sitemap.xml">sitemap.xml</a></span>
+        <span class="badge"><a href="https://USERNAME.github.io/discovery-hub/rss.xml">rss.xml</a></span>
+        <span class="badge"><a href="https://USERNAME.github.io/discovery-hub/robots.txt">robots.txt</a></span>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>URL</th>
+              <th>Host</th>
+              <th>Path</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class='num'>1</td><td class='url'><a href='https://example.com/page1' rel='nofollow noopener' target='_blank'>https://example.com/page1</a></td><td class='host'>example.com</td><td class='path'>/page1</td></tr><tr><td class='num'>2</td><td class='url'><a href='https://example.com/page2' rel='nofollow noopener' target='_blank'>https://example.com/page2</a></td><td class='host'>example.com</td><td class='path'>/page2</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="footer">
+        This page lists the URLs you pasted into <code>data/daily.csv</code>.
+      </div>
+    </div>
+  </div>
+</body>
+</html>
