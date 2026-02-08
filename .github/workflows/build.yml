@@ -19,7 +19,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: discovery-hub-build
+  group: discovery-hub-pages
   cancel-in-progress: true
 
 jobs:
@@ -142,7 +142,7 @@ jobs:
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        timeout-minutes: 2
+        timeout-minutes: 3
 
       - name: Deploy to Vercel (static docs)
         env:
@@ -169,6 +169,11 @@ jobs:
         with:
           path: ./docs
 
+  deploy_pages:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    steps:
       - name: Deploy to GitHub Pages
-        id: deployment
         uses: actions/deploy-pages@v4
