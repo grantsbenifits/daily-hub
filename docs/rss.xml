@@ -4,8 +4,7 @@
 <title>Discovery Hub Feed</title>
 <link>https://grantsbenifits.github.io/daily-hub/all.html</link>
 <description>Latest URLs from data/daily.csv</description>
-<lastBuildDate>Sun, 08 Feb 2026 12:55:45 GMT</lastBuildDate>
-<item><title>https://example.com/page1</title><link>https://example.com/page1</link><guid isPermaLink="true">https://example.com/page1</guid><pubDate>Sun, 08 Feb 2026 12:55:45 GMT</pubDate><description>External URL: https://example.com/page1</description></item>
-<item><title>https://example.com/page2</title><link>https://example.com/page2</link><guid isPermaLink="true">https://example.com/page2</guid><pubDate>Sun, 08 Feb 2026 12:55:45 GMT</pubDate><description>External URL: https://example.com/page2</description></item>
+<lastBuildDate>Sun, 08 Feb 2026 13:00:32 GMT</lastBuildDate>
+
 </channel>
 </rss>
