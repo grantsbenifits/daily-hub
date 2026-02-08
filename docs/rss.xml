@@ -4,9 +4,7 @@
 <title>Discovery Hub Feed</title>
 <link>https://grantsbenifits.github.io/daily-hub/all.html</link>
 <description>Latest URLs from data/daily.csv</description>
-<lastBuildDate>Sun, 08 Feb 2026 13:13:45 GMT</lastBuildDate>
-<item><title>https://yourlink1.com/page</title><link>https://yourlink1.com/page</link><guid isPermaLink="true">https://yourlink1.com/page</guid><pubDate>Sun, 08 Feb 2026 13:13:45 GMT</pubDate><description>External URL: https://yourlink1.com/page</description></item>
-<item><title>https://yourlink2.com/page</title><link>https://yourlink2.com/page</link><guid isPermaLink="true">https://yourlink2.com/page</guid><pubDate>Sun, 08 Feb 2026 13:13:45 GMT</pubDate><description>External URL: https://yourlink2.com/page</description></item>
-<item><title>https://www.slideshare.net/housinggrantsfinder</title><link>https://www.slideshare.net/housinggrantsfinder</link><guid isPermaLink="true">https://www.slideshare.net/housinggrantsfinder</guid><pubDate>Sun, 08 Feb 2026 13:13:45 GMT</pubDate><description>External URL: https://www.slideshare.net/housinggrantsfinder</description></item>
+<lastBuildDate>Sun, 08 Feb 2026 13:15:53 GMT</lastBuildDate>
+<item><title>https://www.slideshare.net/housinggrantsfinder</title><link>https://www.slideshare.net/housinggrantsfinder</link><guid isPermaLink="true">https://www.slideshare.net/housinggrantsfinder</guid><pubDate>Sun, 08 Feb 2026 13:15:53 GMT</pubDate><description>External URL: https://www.slideshare.net/housinggrantsfinder</description></item>
 </channel>
 </rss>
