@@ -14,12 +14,10 @@ on:
         default: ""
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
-  group: discovery-hub-pages
+  group: discovery-hub-build
   cancel-in-progress: true
 
 jobs:
@@ -31,29 +29,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: main
           fetch-depth: 0
-          persist-credentials: false
+          persist-credentials: true
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Setup Node (for Vercel CLI)
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - name: Set BASE_URL (Vercel canonical)
-        run: echo "BASE_URL=https://daily-hub-livid.vercel.app" >> $GITHUB_ENV
-
-      - name: Restore previous state from Netlify (optional)
-        run: |
-          mkdir -p data
-          curl -fsSL https://dailyhubs.netlify.app/state/daily.csv -o data/daily.csv || true
-          curl -fsSL https://dailyhubs.netlify.app/state/history.csv -o data/history.csv || true
-          curl -fsSL https://dailyhubs.netlify.app/state/enriched.json -o data/enriched.json || true
+      - name: Set BASE_URL (canonical)
+        run: echo "BASE_URL=https://dailyhubs.netlify.app" >> $GITHUB_ENV
 
       - name: Append URLs from manual run into data/daily.csv
         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.urls != '' }}
@@ -113,36 +103,39 @@ jobs:
         env:
           ENABLE_INDEXNOW: "1"
           ENABLE_PINGOMATIC: "1"
-          ENABLE_AI: "1"
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_MODEL: "gemini-2.5-flash"
-          ENRICH_TTL_DAYS: "14"
-          MAX_AI_CALLS: "30"
         run: python scripts/build.py
 
-      - name: Publish state files into docs (for persistence)
+      - name: Commit generated files
         run: |
-          mkdir -p docs/state
-          cp -f data/daily.csv docs/state/daily.csv || true
-          cp -f data/history.csv docs/state/history.csv || true
-          cp -f data/enriched.json docs/state/enriched.json || true
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No changes to commit."
+            exit 0
+          fi
 
-      - name: Deploy to Netlify (static docs)
-        if: ${{ secrets.NETLIFY_AUTH_TOKEN != '' && secrets.NETLIFY_SITE_ID != '' }}
-        uses: nwtgck/actions-netlify@v3.0.0
-        with:
-          publish-dir: "./docs"
-          production-branch: "main"
-          production-deploy: true
-          enable-pull-request-comment: false
-          enable-commit-comment: false
-          enable-commit-status: false
-          enable-github-deployment: false
-          deploy-message: "Discovery Hub production deploy"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add docs/ data/ scripts/ .github/workflows/build.yml || true
+          git commit -m "Auto-build docs"
+          git push
+
+      - name: Deploy to Netlify (CLI)
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        timeout-minutes: 3
+        run: |
+          if [ -z "$NETLIFY_AUTH_TOKEN" ] || [ -z "$NETLIFY_SITE_ID" ]; then
+            echo "Netlify secrets missing, skipping deploy."
+            exit 0
+          fi
+
+          npm i -g netlify-cli@latest
+          netlify deploy \
+            --dir=docs \
+            --prod \
+            --site "$NETLIFY_SITE_ID" \
+            --auth "$NETLIFY_AUTH_TOKEN" \
+            --message "Discovery Hub deploy"
 
       - name: Deploy to Vercel (static docs)
         env:
@@ -160,20 +153,3 @@ jobs:
           mkdir -p .vercel
           printf '{"orgId":"%s","projectId":"%s"}' "$VERCEL_ORG_ID" "$VERCEL_PROJECT_ID" > .vercel/project.json
           vercel deploy --prod --yes --token "$VERCEL_TOKEN"
-
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./docs
-
-  deploy_pages:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-    steps:
-      - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v4
