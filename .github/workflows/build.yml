@@ -119,6 +119,23 @@ jobs:
           git commit -m "Auto-build docs"
           git push
 
+      - name: Deploy to Netlify (static docs)
+        if: ${{ secrets.NETLIFY_AUTH_TOKEN != '' && secrets.NETLIFY_SITE_ID != '' }}
+        uses: nwtgck/actions-netlify@v3.0.0
+        with:
+          publish-dir: "./docs"
+          production-branch: "main"
+          production-deploy: true
+          enable-pull-request-comment: false
+          enable-commit-comment: false
+          enable-commit-status: false
+          enable-github-deployment: false
+          deploy-message: "Discovery Hub production deploy"
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        timeout-minutes: 2
+
       - name: Deploy to Vercel (static docs)
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
