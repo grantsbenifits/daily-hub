@@ -29,6 +29,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
           persist-credentials: true
 
@@ -103,15 +104,15 @@ jobs:
         env:
           ENABLE_INDEXNOW: "1"
           ENABLE_PINGOMATIC: "1"
-          ENABLE_AI: "1"
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_MODEL: "gemini-2.5-flash"
-          ENRICH_TTL_DAYS: "14"
-          MAX_AI_CALLS: "30"
         run: python scripts/build.py
 
       - name: Commit generated files
         run: |
+          BRANCH="main"
+
+          git fetch origin "$BRANCH"
+          git checkout -B "$BRANCH" "origin/$BRANCH"
+
           if [ -z "$(git status --porcelain)" ]; then
             echo "No changes to commit."
             exit 0
@@ -122,21 +123,20 @@ jobs:
 
           git add docs/ data/ scripts/ .github/workflows/build.yml || true
           git commit -m "Auto-build docs"
-          git push
+          git push origin "HEAD:$BRANCH"
 
       - name: Deploy to Netlify (static docs)
-        if: ${{ secrets.NETLIFY_AUTH_TOKEN && secrets.NETLIFY_SITE_ID }}
-        uses: nwtgck/actions-netlify@v3.0
+        if: ${{ secrets.NETLIFY_AUTH_TOKEN != '' && secrets.NETLIFY_SITE_ID != '' }}
+        uses: nwtgck/actions-netlify@v3.0.0
         with:
           publish-dir: "./docs"
-          production-branch: main
+          production-branch: "main"
           production-deploy: true
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          deploy-message: "Deploy docs from GitHub Actions"
           enable-pull-request-comment: false
           enable-commit-comment: false
-          overwrites-pull-request-comment: true
-          fails-without-credentials: false
+          enable-commit-status: false
+          enable-github-deployment: false
+          deploy-message: "Discovery Hub production deploy"
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
