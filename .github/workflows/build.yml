@@ -6,6 +6,13 @@ on:
     paths-ignore:
       - "docs/**"
 
+  workflow_dispatch:
+    inputs:
+      urls:
+        description: "Paste URLs (one per line)"
+        required: false
+        default: ""
+
 permissions:
   contents: write
 
@@ -15,6 +22,7 @@ concurrency:
 
 jobs:
   build:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.actor != 'github-actions[bot]' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -30,6 +38,61 @@ jobs:
 
       - name: Set BASE_URL
         run: echo "BASE_URL=https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/" >> $GITHUB_ENV
+
+      - name: Append URLs from manual run into data/daily.csv
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.urls != '' }}
+        env:
+          INPUT_URLS: ${{ github.event.inputs.urls }}
+        run: |
+          python - <<'PY'
+          import os, re
+          from pathlib import Path
+
+          raw = os.environ.get("INPUT_URLS", "")
+          urls = [u.strip() for u in raw.splitlines() if u.strip()]
+
+          if not urls:
+            raise SystemExit(0)
+
+          p = Path("data/daily.csv")
+          p.parent.mkdir(parents=True, exist_ok=True)
+
+          if not p.exists():
+            p.write_text("url\n", encoding="utf-8")
+
+          lines = p.read_text(encoding="utf-8").splitlines()
+          has_header = bool(lines) and lines[0].strip().lower() == "url"
+          existing = set()
+
+          if has_header:
+            for line in lines[1:]:
+              t = line.strip()
+              if t:
+                existing.add(t)
+          else:
+            for line in lines:
+              t = line.strip()
+              if t and t.lower() != "url":
+                existing.add(t)
+
+          add = []
+          for u in urls:
+            if not re.match(r"^https?://", u, re.I):
+              continue
+            if u in existing:
+              continue
+            add.append(u)
+            existing.add(u)
+
+          if not add:
+            raise SystemExit(0)
+
+          with p.open("a", encoding="utf-8", newline="\n") as f:
+            for u in add:
+              f.write(u + "\n")
+
+          print(f"Appended {len(add)} URL(s) to {p}")
+          PY
 
       - name: Build docs
         run: python scripts/build.py
