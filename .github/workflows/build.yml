@@ -153,3 +153,21 @@ jobs:
           mkdir -p .vercel
           printf '{"orgId":"%s","projectId":"%s"}' "$VERCEL_ORG_ID" "$VERCEL_PROJECT_ID" > .vercel/project.json
           vercel deploy --prod --yes --token "$VERCEL_TOKEN"
+
+      - name: Deploy to Cloudflare Pages (Wrangler)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_PROJECT_NAME: ${{ secrets.CLOUDFLARE_PROJECT_NAME }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ] || [ -z "$CLOUDFLARE_PROJECT_NAME" ]; then
+            echo "Cloudflare secrets missing, skipping deploy."
+            exit 0
+          fi
+
+          npm i -g wrangler@latest
+
+          wrangler pages deploy docs \
+            --project-name "$CLOUDFLARE_PROJECT_NAME" \
+            --branch main \
+            --commit-dirty=true
