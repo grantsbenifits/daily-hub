@@ -105,6 +105,12 @@ jobs:
           ENABLE_PINGOMATIC: "1"
         run: python scripts/build.py
 
+      - name: Ensure index.html exists (Pages root)
+        run: |
+          if [ ! -f docs/index.html ] && [ -f docs/all.html ]; then
+            cp docs/all.html docs/index.html
+          fi
+
       - name: Commit generated files
         run: |
           if [ -z "$(git status --porcelain)" ]; then
