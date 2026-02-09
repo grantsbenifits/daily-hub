@@ -42,8 +42,18 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Set BASE_URL (canonical)
-        run: echo "BASE_URL=https://dailyhubs.netlify.app" >> $GITHUB_ENV
+      - name: Compute BASE URLs
+        env:
+          CF_PROJECT: ${{ secrets.CLOUDFLARE_PROJECT_NAME }}
+        run: |
+          OWNER="${GITHUB_REPOSITORY%%/*}"
+          REPO="${GITHUB_REPOSITORY##*/}"
+          echo "GH_BASE_URL=https://${OWNER}.github.io/${REPO}" >> $GITHUB_ENV
+          echo "NETLIFY_BASE_URL=https://dailyhubs.netlify.app" >> $GITHUB_ENV
+          echo "VERCEL_BASE_URL=https://daily-hub-livid.vercel.app" >> $GITHUB_ENV
+          if [ -n "$CF_PROJECT" ]; then
+            echo "CF_BASE_URL=https://${CF_PROJECT}.pages.dev" >> $GITHUB_ENV
+          fi
 
       - name: Append URLs from manual run into data/daily.csv
         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.urls != '' }}
@@ -99,17 +109,24 @@ jobs:
           print(f"Appended {len(add)} URL(s) to {p}")
           PY
 
-      - name: Build docs
+      - name: Clean dist
+        run: |
+          rm -rf dist || true
+          mkdir -p dist
+
+      # 1) GitHub Pages build (docs/)
+      - name: Build for GitHub Pages (self canonical)
         env:
+          BASE_URL: ${{ env.GH_BASE_URL }}
+          DOCS_DIR: "docs"
           ENABLE_INDEXNOW: "1"
           ENABLE_PINGOMATIC: "1"
+          ENABLE_AI: "1"
+          ENABLE_SITE_BLURB: "1"
+          SITE_NAME: "Discovery Hub"
+          SITE_VARIANT: "github-pages"
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python scripts/build.py
-
-      - name: Ensure index.html exists (Pages root)
-        run: |
-          if [ ! -f docs/index.html ] && [ -f docs/all.html ]; then
-            cp docs/all.html docs/index.html
-          fi
 
       - name: Commit generated files
         run: |
@@ -125,6 +142,20 @@ jobs:
           git commit -m "Auto-build docs"
           git push
 
+      # 2) Netlify build (dist/netlify)
+      - name: Build for Netlify (self canonical)
+        env:
+          BASE_URL: ${{ env.NETLIFY_BASE_URL }}
+          DOCS_DIR: "dist/netlify"
+          ENABLE_INDEXNOW: "1"
+          ENABLE_PINGOMATIC: "1"
+          ENABLE_AI: "1"
+          ENABLE_SITE_BLURB: "1"
+          SITE_NAME: "Discovery Hub"
+          SITE_VARIANT: "netlify"
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python scripts/build.py
+
       - name: Deploy to Netlify (CLI)
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
@@ -137,13 +168,27 @@ jobs:
 
           npm i -g netlify-cli@latest
           netlify deploy \
-            --dir=docs \
+            --dir=dist/netlify \
             --prod \
             --site "$NETLIFY_SITE_ID" \
             --auth "$NETLIFY_AUTH_TOKEN" \
-            --message "Discovery Hub deploy"
+            --message "Discovery Hub deploy (netlify)"
 
-      - name: Deploy to Vercel (static docs)
+      # 3) Vercel build (dist/vercel)
+      - name: Build for Vercel (self canonical)
+        env:
+          BASE_URL: ${{ env.VERCEL_BASE_URL }}
+          DOCS_DIR: "dist/vercel"
+          ENABLE_INDEXNOW: "1"
+          ENABLE_PINGOMATIC: "1"
+          ENABLE_AI: "1"
+          ENABLE_SITE_BLURB: "1"
+          SITE_NAME: "Discovery Hub"
+          SITE_VARIANT: "vercel"
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python scripts/build.py
+
+      - name: Deploy to Vercel (static)
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -155,10 +200,24 @@ jobs:
           fi
 
           npm i -g vercel@latest
-          cd docs
+          cd dist/vercel
           mkdir -p .vercel
           printf '{"orgId":"%s","projectId":"%s"}' "$VERCEL_ORG_ID" "$VERCEL_PROJECT_ID" > .vercel/project.json
           vercel deploy --prod --yes --token "$VERCEL_TOKEN"
+
+      # 4) Cloudflare Pages build (dist/cloudflare)
+      - name: Build for Cloudflare Pages (self canonical)
+        env:
+          BASE_URL: ${{ env.CF_BASE_URL }}
+          DOCS_DIR: "dist/cloudflare"
+          ENABLE_INDEXNOW: "1"
+          ENABLE_PINGOMATIC: "1"
+          ENABLE_AI: "1"
+          ENABLE_SITE_BLURB: "1"
+          SITE_NAME: "Discovery Hub"
+          SITE_VARIANT: "cloudflare"
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python scripts/build.py
 
       - name: Deploy to Cloudflare Pages (Wrangler)
         env:
@@ -172,8 +231,7 @@ jobs:
           fi
 
           npm i -g wrangler@latest
-
-          wrangler pages deploy docs \
+          wrangler pages deploy dist/cloudflare \
             --project-name "$CLOUDFLARE_PROJECT_NAME" \
             --branch main \
             --commit-dirty=true
