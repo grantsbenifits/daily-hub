@@ -431,7 +431,7 @@ def html_page(title: str, canonical_url: str, urls: list[str], built_utc: str, b
         rows.append(
             "<tr>"
             f"<td class='num'>{i}</td>"
-            f"<td class='url'><a href='{u}' target='_blank' rel='nofollow noopener'>{u}</a></td>"
+            f"<td class='url'><a href='{u}' target='_blank' rel='noopener'>{u}</a></td>"
             f"<td class='host'>{xml_escape(host)}</td>"
             f"<td class='path'>{xml_escape(path)}</td>"
             "</tr>"
