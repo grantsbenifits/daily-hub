@@ -10,7 +10,17 @@
       "blurb": "Discovery Hub is a lightweight discovery page that lists recently added links. This build is labeled github-pages.",
       "meta_description": "Discovery Hub is a lightweight discovery page that lists recently added links. This build is labeled github-pages.",
       "fetched_utc": "2026-02-09T14:29:07Z"
+    },
+    "https://daily-hub-livid.vercel.app": {
+      "blurb": "Discovery Hub is a small link hub that lists recently added URLs. This build is labeled vercel.",
+      "meta_description": "Discovery Hub lists recently added links with simple summaries. Build label: vercel.",
+      "fetched_utc": "2026-02-10T10:28:21Z"
+    },
+    "https://daily-hub.pages.dev": {
+      "blurb": "Discovery Hub is a small link hub that lists recently added URLs. This build is labeled cloudflare.",
+      "meta_description": "Discovery Hub lists recently added links with simple summaries. Build label: cloudflare.",
+      "fetched_utc": "2026-02-10T10:28:23Z"
     }
   },
-  "generated_utc": "2026-02-09T14:29:07Z"
+  "generated_utc": "2026-02-10T10:28:23Z"
 }
