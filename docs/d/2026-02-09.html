@@ -4,55 +4,182 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Discovery Hub 2026-02-09</title>
-  <meta name='description' content='Discovery Hub is a lightweight discovery page that lists recently added links. This build is labeled github-pages.' />
+  <meta name="description" content="Discovery Hub is a lightweight discovery page that lists recently added links. This build is labeled github-pages." />
   <meta name="robots" content="index,follow" />
-  <link rel='canonical' href='https://grantsbenifits.github.io/daily-hub/d/2026-02-09.html' />
-  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "ItemList", "name": "Discovery Hub 2026-02-09", "description": "Curated list updated on 2026-02-10 09:48:07 UTC", "numberOfItems": 1, "itemListElement": [{"@type": "ListItem", "position": 1, "url": "https://www.google.com/"}]}</script>
+  <link rel="canonical" href="https://grantsbenifits.github.io/daily-hub/d/2026-02-09.html" />
+  <meta property="og:title" content="Discovery Hub 2026-02-09" />
+  <meta property="og:description" content="Discovery Hub is a lightweight discovery page that lists recently added links. This build is labeled github-pages." />
+  <meta property="og:type" content="website" />
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "ItemList", "name": "Discovery Hub 2026-02-09", "description": "Curated list updated on 2026-02-10 10:27:44 UTC", "numberOfItems": 1, "itemListElement": [{"@type": "ListItem", "position": 1, "url": "https://www.google.com/"}]}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "Discovery Hub", "url": "https://grantsbenifits.github.io/daily-hub"}</script>
   <style>
     :root {
       --bg: #0b1220;
       --text: #e5e7eb;
       --muted: #9ca3af;
       --line: rgba(255,255,255,0.12);
-      --link: #93c5fd;
+      --link: #71c5f4;
+      --accent: #40e3e7;
+      --accent2: #502fda;
+      --card: rgba(17,26,43,0.72);
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
-      background: radial-gradient(1200px 700px at 30% -10%, rgba(59,130,246,0.22), transparent 50%),
-                  radial-gradient(1000px 600px at 110% 20%, rgba(34,197,94,0.18), transparent 45%),
-                  var(--bg);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 700px at 18% -12%, #40e3e733, transparent 52%), radial-gradient(1000px 600px at 112% 24%, #502fda2e, transparent 48%), radial-gradient(900px 520px at 46% 112%, #40e3e718, transparent 55%), var(--bg);
       color: var(--text);
     }
-    .wrap { max-width: 1100px; margin: 0 auto; padding: 28px 18px 48px; }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 28px 18px 52px; }
     .card {
-      background: rgba(17,26,43,0.72);
+      background: var(--card);
       border: 1px solid var(--line);
-      border-radius: 16px;
+      border-radius: 18px;
       padding: 18px 18px;
       backdrop-filter: blur(10px);
     }
-    h1 { margin: 0 0 8px; font-size: 22px; letter-spacing: 0.2px; }
+    .topbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      margin: 2px 0 10px;
+    }
+    h1 { margin: 0; font-size: 22px; letter-spacing: 0.2px; }
+    .subtle { color: var(--muted); font-size: 12px; }
     .meta {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px 16px;
+      gap: 10px 14px;
       align-items: center;
-      margin: 8px 0 10px;
+      margin: 8px 0 12px;
       color: var(--muted);
       font-size: 13px;
     }
     .meta a { color: var(--link); text-decoration: none; }
     .meta a:hover { text-decoration: underline; }
-
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(0,0,0,0.18);
+      white-space: nowrap;
+    }
     .blurb {
-      margin: 6px 0 14px;
+      margin: 8px 0 14px;
       color: #cbd5e1;
       font-size: 13px;
-      line-height: 1.55;
+      line-height: 1.6;
     }
-
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 12px;
+      margin: 10px 0 14px;
+    }
+    .panel {
+      grid-column: span 12;
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 14px;
+      background: rgba(0,0,0,0.14);
+      padding: 12px;
+    }
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: 14px;
+      letter-spacing: 0.2px;
+    }
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .stat {
+      padding: 8px 10px;
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 12px;
+      background: rgba(0,0,0,0.10);
+      font-size: 12px;
+      color: #cbd5e1;
+    }
+    .featured {
+      grid-column: span 12;
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .fcard {
+      grid-column: span 12;
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 14px;
+      background: rgba(0,0,0,0.14);
+      padding: 12px;
+    }
+    @media (min-width: 820px) {
+      .fcard { grid-column: span 6; }
+      .panel { grid-column: span 12; }
+    }
+    @media (min-width: 1020px) {
+      .fcard { grid-column: span 4; }
+    }
+    .f-title {
+      font-size: 13px;
+      font-weight: 650;
+      margin: 0 0 6px;
+    }
+    .f-title a { color: var(--link); text-decoration: none; }
+    .f-title a:hover { text-decoration: underline; }
+    .f-summ {
+      font-size: 12px;
+      color: #cbd5e1;
+      line-height: 1.45;
+      margin: 0 0 8px;
+    }
+    .f-url {
+      font-size: 11px;
+      color: var(--muted);
+      word-break: break-all;
+    }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .chip {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.16);
+      color: #d1d5db;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      margin: 10px 0 10px;
+    }
+    .search {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      width: min(520px, 100%);
+    }
+    .search input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(0,0,0,0.18);
+      color: var(--text);
+      outline: none;
+    }
+    .search input::placeholder { color: rgba(229,231,235,0.55); }
+    .hint { font-size: 12px; color: var(--muted); }
     .table-wrap {
       overflow: auto;
       border-radius: 12px;
@@ -61,14 +188,14 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 760px;
+      min-width: 820px;
       background: rgba(0,0,0,0.16);
     }
     thead th {
       text-align: left;
       font-size: 12px;
       color: var(--muted);
-      font-weight: 600;
+      font-weight: 650;
       padding: 10px 10px;
       border-bottom: 1px solid var(--line);
       position: sticky;
@@ -86,20 +213,8 @@
     tbody tr:hover td { background: rgba(255,255,255,0.04); }
     td.num { width: 62px; color: var(--muted); }
     td.url a { color: var(--link); word-break: break-all; }
-    td.host { width: 220px; color: #d1d5db; }
+    td.host { width: 230px; color: #d1d5db; }
     td.path { color: #d1d5db; word-break: break-word; }
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 10px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: rgba(0,0,0,0.18);
-    }
-    .footer { margin-top: 14px; color: var(--muted); font-size: 12px; }
-    code { color: #d1fae5; }
-
     .meta-row td { padding-top: 0; }
     .u-meta {
       padding: 10px 12px;
@@ -108,40 +223,18 @@
       background: rgba(0,0,0,0.10);
       margin: 0 0 10px;
     }
-    .u-title { font-size: 13px; color: #e5e7eb; font-weight: 600; margin-bottom: 4px; }
-    .u-summ { font-size: 12px; color: #cbd5e1; margin-bottom: 6px; }
+    .u-title { font-size: 13px; color: #e5e7eb; font-weight: 650; margin-bottom: 4px; }
+    .u-summ { font-size: 12px; color: #cbd5e1; margin-bottom: 6px; line-height: 1.5; }
     .u-extra { font-size: 11px; color: var(--muted); }
-  </style>
+    .footer { margin-top: 14px; color: var(--muted); font-size: 12px; }
+    code { color: #d1fae5; }
+    .navlinks a {
+      color: var(--link);
+      text-decoration: none;
+      margin-right: 10px;
+      font-size: 12px;
+    }
+    .navlinks a:hover { text-decoration: underline; }
+    </style>
 </head>
-<body>
-  <div class="wrap">
-    <div class="card">
-      <h1>Discovery Hub 2026-02-09</h1>
-      <div class="meta">
-        <span class='badge'>URLs: <strong style='color:var(--text)'>1</strong></span><span class='badge'>Built: <strong style='color:var(--text)'>2026-02-10 09:48:07 UTC</strong></span><span class='badge'><a href='https://grantsbenifits.github.io/daily-hub/all.html'>all.html</a></span><span class='badge'><a href='https://grantsbenifits.github.io/daily-hub/sitemap.xml'>sitemap.xml</a></span><span class='badge'><a href='https://grantsbenifits.github.io/daily-hub/rss.xml'>rss.xml</a></span>
-      </div>
-      <div class='blurb'>Discovery Hub is a lightweight discovery page that lists recently added links. This build is labeled github-pages.</div>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>URL</th>
-              <th>Host</th>
-              <th>Path</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td class='num'>1</td><td class='url'><a href='https://www.google.com/' target='_blank' rel='noopener'>https://www.google.com/</a></td><td class='host'>www.google.com</td><td class='path'>/</td></tr><tr class='meta-row'><td class='num'></td><td colspan='3'><div class='u-meta'><div class='u-title'>Google</div><div class='u-summ'>Search the world</div><div class='u-extra'>website | 2026-02-09T10:20:48Z</div></div></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="footer">
-        Generated from <code>data/daily.csv</code> and stored in <code>data/history.csv</code>.
-      </div>
-    </div>
-  </div>
-</body>
-</html>
+<body><div class='wrap'><div class='card'><div class='topbar'><h1>Discovery Hub 2026-02-09</h1><div class='subtle'>github-pages</div></div><div class='meta'><span class='badge'>URLs: <strong style='color:var(--text)'>1</strong></span><span class='badge'>Built: <strong style='color:var(--text)'>2026-02-10 10:27:44 UTC</strong></span><span class='badge'><a href='https://grantsbenifits.github.io/daily-hub/all.html'>all.html</a></span><span class='badge'><a href='https://grantsbenifits.github.io/daily-hub/'>home</a></span><span class='badge'><a href='https://grantsbenifits.github.io/daily-hub/sitemap.xml'>sitemap.xml</a></span><span class='badge'><a href='https://grantsbenifits.github.io/daily-hub/rss.xml'>rss.xml</a></span></div><div class='blurb'>Discovery Hub is a lightweight discovery page that lists recently added links. This build is labeled github-pages.</div><div class='controls'><div class='search'><input id='q' type='search' placeholder='Filter by host, title, or URL' autocomplete='off' /></div><div class='hint'>Type to filter the list</div></div><div class='table-wrap'><table><thead><tr><th>#</th><th>URL</th><th>Host</th><th>Path</th></tr></thead><tbody><tr class='data-row'><td class='num'>1</td><td class='url'><a href='https://www.google.com/' target='_blank' rel='noopener'>https://www.google.com/</a></td><td class='host'>www.google.com</td><td class='path'>/</td></tr><tr class='meta-row'><td class='num'></td><td colspan='3'><div class='u-meta'><div class='u-title'>Google</div><div class='u-summ'>Search the world</div><div class='u-extra'>website | 2026-02-09T10:20:48Z</div></div></td></tr></tbody></table></div><script>const q=document.getElementById('q');function norm(s){return (s||'').toLowerCase();}q.addEventListener('input',()=>{const v=norm(q.value);const rows=[...document.querySelectorAll('tr.data-row')];for(const r of rows){const txt=norm(r.innerText);const show = !v || txt.includes(v);r.style.display = show ? '' : 'none';let nxt=r.nextElementSibling;if(nxt && nxt.classList.contains('meta-row')) nxt.style.display = show ? '' : 'none';}});</script><div class='footer'>Generated from <code>data/daily.csv</code> and stored in <code>data/history.csv</code>.</div></div></div></body></html>
