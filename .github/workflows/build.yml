@@ -1,3 +1,4 @@
+# FILE: .github/workflows/build.yml
 name: Build Discovery Hub
 
 on:
@@ -48,11 +49,16 @@ jobs:
         run: |
           OWNER="${GITHUB_REPOSITORY%%/*}"
           REPO="${GITHUB_REPOSITORY##*/}"
+          echo "REPO_URL=https://github.com/${OWNER}/${REPO}" >> $GITHUB_ENV
+
           echo "GH_BASE_URL=https://${OWNER}.github.io/${REPO}" >> $GITHUB_ENV
           echo "NETLIFY_BASE_URL=https://dailyhubs.netlify.app" >> $GITHUB_ENV
           echo "VERCEL_BASE_URL=https://daily-hub-livid.vercel.app" >> $GITHUB_ENV
+
           if [ -n "$CF_PROJECT" ]; then
             echo "CF_BASE_URL=https://${CF_PROJECT}.pages.dev" >> $GITHUB_ENV
+          else
+            echo "CF_BASE_URL=" >> $GITHUB_ENV
           fi
 
       - name: Append URLs from manual run into data/daily.csv
@@ -114,7 +120,8 @@ jobs:
           rm -rf dist || true
           mkdir -p dist
 
-      # 1) GitHub Pages build (docs/)
+      # Build all variants first, then commit caches once (so Gemini cache persists)
+
       - name: Build for GitHub Pages (self canonical)
         env:
           BASE_URL: ${{ env.GH_BASE_URL }}
@@ -125,24 +132,11 @@ jobs:
           ENABLE_SITE_BLURB: "1"
           SITE_NAME: "Discovery Hub"
           SITE_VARIANT: "github-pages"
+          REPO_URL: ${{ env.REPO_URL }}
+          BUILD_NONCE: ${{ github.run_id }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python scripts/build.py
 
-      - name: Commit generated files
-        run: |
-          if [ -z "$(git status --porcelain)" ]; then
-            echo "No changes to commit."
-            exit 0
-          fi
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git add docs/ data/ scripts/ .github/workflows/build.yml || true
-          git commit -m "Auto-build docs"
-          git push
-
-      # 2) Netlify build (dist/netlify)
       - name: Build for Netlify (self canonical)
         env:
           BASE_URL: ${{ env.NETLIFY_BASE_URL }}
@@ -153,8 +147,55 @@ jobs:
           ENABLE_SITE_BLURB: "1"
           SITE_NAME: "Discovery Hub"
           SITE_VARIANT: "netlify"
+          REPO_URL: ${{ env.REPO_URL }}
+          BUILD_NONCE: ${{ github.run_id }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python scripts/build.py
+
+      - name: Build for Vercel (self canonical)
+        env:
+          BASE_URL: ${{ env.VERCEL_BASE_URL }}
+          DOCS_DIR: "dist/vercel"
+          ENABLE_INDEXNOW: "1"
+          ENABLE_PINGOMATIC: "1"
+          ENABLE_AI: "1"
+          ENABLE_SITE_BLURB: "1"
+          SITE_NAME: "Discovery Hub"
+          SITE_VARIANT: "vercel"
+          REPO_URL: ${{ env.REPO_URL }}
+          BUILD_NONCE: ${{ github.run_id }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python scripts/build.py
+
+      - name: Build for Cloudflare Pages (self canonical)
+        if: ${{ env.CF_BASE_URL != '' }}
+        env:
+          BASE_URL: ${{ env.CF_BASE_URL }}
+          DOCS_DIR: "dist/cloudflare"
+          ENABLE_INDEXNOW: "1"
+          ENABLE_PINGOMATIC: "1"
+          ENABLE_AI: "1"
+          ENABLE_SITE_BLURB: "1"
+          SITE_NAME: "Discovery Hub"
+          SITE_VARIANT: "cloudflare"
+          REPO_URL: ${{ env.REPO_URL }}
+          BUILD_NONCE: ${{ github.run_id }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python scripts/build.py
+
+      - name: Commit generated files (docs + data caches)
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add docs/ data/ scripts/ .github/workflows/build.yml README.md || true
+          git commit -m "Auto-build hub (multi-cloud)"
+          git push
 
       - name: Deploy to Netlify (CLI)
         env:
@@ -174,20 +215,6 @@ jobs:
             --auth "$NETLIFY_AUTH_TOKEN" \
             --message "Discovery Hub deploy (netlify)"
 
-      # 3) Vercel build (dist/vercel)
-      - name: Build for Vercel (self canonical)
-        env:
-          BASE_URL: ${{ env.VERCEL_BASE_URL }}
-          DOCS_DIR: "dist/vercel"
-          ENABLE_INDEXNOW: "1"
-          ENABLE_PINGOMATIC: "1"
-          ENABLE_AI: "1"
-          ENABLE_SITE_BLURB: "1"
-          SITE_NAME: "Discovery Hub"
-          SITE_VARIANT: "vercel"
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: python scripts/build.py
-
       - name: Deploy to Vercel (static)
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -204,20 +231,6 @@ jobs:
           mkdir -p .vercel
           printf '{"orgId":"%s","projectId":"%s"}' "$VERCEL_ORG_ID" "$VERCEL_PROJECT_ID" > .vercel/project.json
           vercel deploy --prod --yes --token "$VERCEL_TOKEN"
-
-      # 4) Cloudflare Pages build (dist/cloudflare)
-      - name: Build for Cloudflare Pages (self canonical)
-        env:
-          BASE_URL: ${{ env.CF_BASE_URL }}
-          DOCS_DIR: "dist/cloudflare"
-          ENABLE_INDEXNOW: "1"
-          ENABLE_PINGOMATIC: "1"
-          ENABLE_AI: "1"
-          ENABLE_SITE_BLURB: "1"
-          SITE_NAME: "Discovery Hub"
-          SITE_VARIANT: "cloudflare"
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: python scripts/build.py
 
       - name: Deploy to Cloudflare Pages (Wrangler)
         env:
